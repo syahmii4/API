@@ -24,6 +24,9 @@ public class Users {
     private String username;
     @Getter
     @Setter
+    private String emailAddress;
+    @Getter
+    @Setter
     private String password;
     @Getter
     @Setter

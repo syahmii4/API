@@ -23,6 +23,7 @@ public class UserService {
         Users newUser = new Users();
         Date date = new Date();
         newUser.setUsername(registerForm.username);
+        newUser.setEmailAddress(registerForm.emailAddress);
         newUser.setPassword(passwordEncoder.encode(registerForm.password));
         newUser.setFullName(registerForm.fullName);
         newUser.setRole(registerForm.role);
