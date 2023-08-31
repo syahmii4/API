@@ -1,14 +1,12 @@
 package org.finalecorp.scorelabs.controllers;
 
+import org.finalecorp.scorelabs.models.Users;
 import org.finalecorp.scorelabs.requestObjects.RegisterForm;
 import org.finalecorp.scorelabs.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class UsersController {
     public UserService userService;
@@ -16,11 +14,12 @@ public class UsersController {
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
-    @PostMapping("/api/v1/createuser")
+    @PostMapping("/rest/auth/createuser")
     public String register(@RequestBody RegisterForm registerForm){
 
         userService.createUser(registerForm);
         return "User registered";
     }
+
 
 }

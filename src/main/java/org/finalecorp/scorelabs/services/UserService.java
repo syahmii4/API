@@ -31,5 +31,6 @@ public class UserService {
         newUser = usersRepository.save(newUser);
         return newUser;
     }
+
 }
 

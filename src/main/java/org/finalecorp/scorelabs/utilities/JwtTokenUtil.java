@@ -4,6 +4,8 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import org.finalecorp.scorelabs.models.Users;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import javax.naming.AuthenticationException;
@@ -11,6 +13,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+@Component
 public class JwtTokenUtil {
     private final SecretKey key;
     private final long accessTokenValidity = 60*60*1000;
@@ -22,7 +25,7 @@ public class JwtTokenUtil {
 
     public JwtTokenUtil(){
         key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        this.jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
+        this.jwtParser = Jwts.parser().setSigningKey(key);
     }
 
     public String createToken(Users user){
