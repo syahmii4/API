@@ -1,8 +1,5 @@
 package org.finalecorp.scorelabs.models;
 
-<<<<<<< Updated upstream
-public class Students {
-=======
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,7 +16,7 @@ public class Students {
     private int studentId;
     @Getter
     @Setter
-    private int suerId;
+    private int userId;
     @Getter
     @Setter
     private int academicLevel;
@@ -30,6 +27,4 @@ public class Students {
     @Setter
     private int points;
 
-
->>>>>>> Stashed changes
 }
