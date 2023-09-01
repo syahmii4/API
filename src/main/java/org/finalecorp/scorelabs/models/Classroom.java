@@ -8,23 +8,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-public class Students {
+public class Classroom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
     @Setter
-    private int studentId;
+    private int classroomId;
     @Getter
     @Setter
-    private int userId;
+    private int studentsId;
     @Getter
     @Setter
-    private int academicLevel;
-    @Getter
-    @Setter
-    private int academicYear;
-    @Getter
-    @Setter
-    private int points;
-
+    private int classId;
 }

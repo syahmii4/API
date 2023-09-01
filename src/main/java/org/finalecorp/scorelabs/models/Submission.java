@@ -1,5 +1,6 @@
 package org.finalecorp.scorelabs.models;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -8,23 +9,25 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-public class Students {
+public class Submission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
+    @Setter
+    private int submissionId;
+    @Getter
+    @Setter
+    private int assignmentId;
     @Getter
     @Setter
     private int studentId;
     @Getter
     @Setter
-    private int userId;
-    @Getter
-    @Setter
-    private int academicLevel;
-    @Getter
-    @Setter
-    private int academicYear;
+    private JSONPObject answer;
     @Getter
     @Setter
     private int points;
+
+
 
 }
