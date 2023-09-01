@@ -21,5 +21,9 @@ public class UsersController {
         return "User registered";
     }
 
-
+    @ResponseBody
+    @PostMapping("/rest/auth/checkuser")
+    public Boolean checkUser(@RequestBody String username){
+        return userService.userExists(username);
+    }
 }

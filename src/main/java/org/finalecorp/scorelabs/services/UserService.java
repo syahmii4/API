@@ -32,5 +32,8 @@ public class UserService {
         return newUser;
     }
 
+    public boolean userExists(String username){
+        return usersRepository.findUsersByUsername(username) != null;
+    }
 }
 

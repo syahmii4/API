@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig{
+public class SecurityConfig {
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
 
     public SecurityConfig(AuthUserDetailsService customUserDetailsService, JwtAuthorizationFilter jwtAuthorizationFilter) {
@@ -30,7 +30,6 @@ public class SecurityConfig{
         this.jwtAuthorizationFilter = jwtAuthorizationFilter;
 
     }
-
 
     @Autowired
     private AuthUserDetailsService authUserDetailsService;
@@ -41,21 +40,28 @@ public class SecurityConfig{
         authenticationManagerBuilder.userDetailsService(authUserDetailsService).passwordEncoder(encoder());
         return authenticationManagerBuilder.build();
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.httpBasic((httpSecurityHttpBasicConfigurer -> {
+        http.httpBasic(httpSecurityHttpBasicConfigurer -> {
             try {
                 httpSecurityHttpBasicConfigurer.disable().formLogin((AbstractHttpConfigurer::disable));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        })).csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(
-                authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry.requestMatchers("/rest/auth/**").permitAll().anyRequest().authenticated())
-                .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        }).csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(matcherRegistry -> matcherRegistry
+                        .requestMatchers("/rest/auth/**")
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated())
+                .sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
     @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
