@@ -36,4 +36,3 @@ public class UserService {
         return usersRepository.findUsersByUsername(username) != null;
     }
 }
-
