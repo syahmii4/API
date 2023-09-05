@@ -1,14 +1,16 @@
 package org.finalecorp.scorelabs.models;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.sql.Timestamp;
+import java.util.Map;
 
 @Entity
 public class Assignment {
@@ -37,7 +39,8 @@ public class Assignment {
     private String assignmentType;
     @Getter
     @Setter
-    private JSONPObject question;
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, String> question;
 
 }
 
