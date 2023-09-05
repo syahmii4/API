@@ -19,9 +19,6 @@ public class Classes {
     private String className;
     @Getter
     @Setter
-    private int classYear;
-    @Getter
-    @Setter
     private int teacherId;
 
 }
