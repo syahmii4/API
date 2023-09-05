@@ -16,7 +16,7 @@ public class Classroom {
     private int classroomId;
     @Getter
     @Setter
-    private int studentsId;
+    private int studentId;
     @Getter
     @Setter
     private int classId;
