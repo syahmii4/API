@@ -19,6 +19,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -44,12 +49,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.httpBasic(httpSecurityHttpBasicConfigurer -> {
-            try {
-                httpSecurityHttpBasicConfigurer.disable().formLogin((AbstractHttpConfigurer::disable));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }).csrf(AbstractHttpConfigurer::disable)
+                    try {
+                        httpSecurityHttpBasicConfigurer.disable().formLogin((AbstractHttpConfigurer::disable));
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }).csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(matcherRegistry -> matcherRegistry
                         .requestMatchers("/rest/auth/**")
                         .permitAll()
@@ -57,7 +62,19 @@ public class SecurityConfig {
                         .authenticated())
                 .sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class).cors(
+                        httpSecurityCorsConfigurer -> {
+                            CorsConfiguration configuration = new CorsConfiguration();
+                            configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+                            configuration.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS", "PUT"));
+                            configuration.addAllowedHeader("*");
+                            configuration.addExposedHeader("Content-Type");
+                            configuration.setAllowCredentials(true);
+                            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                            source.registerCorsConfiguration("/**", configuration);
+                            httpSecurityCorsConfigurer.configurationSource(source);
+                        }
+                );
 
         return http.build();
     }

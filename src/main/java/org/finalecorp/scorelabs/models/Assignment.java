@@ -21,7 +21,10 @@ public class Assignment {
     private int assignmentId;
     @Getter
     @Setter
-    private int subjectId;
+    private int classId;
+    @Getter
+    @Setter
+    private String description;
     @Getter
     @Setter
     private Timestamp dateCreated;

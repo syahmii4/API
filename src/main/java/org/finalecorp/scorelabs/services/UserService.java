@@ -1,5 +1,6 @@
 package org.finalecorp.scorelabs.services;
 
+import lombok.extern.log4j.Log4j2;
 import org.finalecorp.scorelabs.models.Users;
 import org.finalecorp.scorelabs.repositories.RolesRepository;
 import org.finalecorp.scorelabs.repositories.StudentsRepository;
@@ -70,5 +71,14 @@ public class UserService {
     }
     public boolean userExists(String username){
         return usersRepository.findUsersByUsername(username) != null;
+    }
+
+    public boolean validatePassword(Users target, String oldPassword) {
+        return passwordEncoder.matches(oldPassword, target.getPassword());
+    }
+
+    public void changePassword(Users targetUser, String newPassword) {
+        targetUser.setPassword(passwordEncoder.encode((newPassword)));
+        usersRepository.save(targetUser);
     }
 }

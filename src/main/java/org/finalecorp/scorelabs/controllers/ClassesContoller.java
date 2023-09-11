@@ -5,6 +5,7 @@ import org.finalecorp.scorelabs.models.Classroom;
 import org.finalecorp.scorelabs.repositories.ClassesRepository;
 import org.finalecorp.scorelabs.requestObjects.CreateClassForm;
 import org.finalecorp.scorelabs.requestObjects.EditClassForm;
+import org.finalecorp.scorelabs.responseObjects.ClassesInfo;
 import org.finalecorp.scorelabs.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
@@ -108,7 +109,7 @@ public class ClassesContoller {
 
     @GetMapping("/view")
     @ResponseBody
-    public List<Classes> viewClasses(){
+    public List<ClassesInfo> viewClasses(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
@@ -125,6 +126,31 @@ public class ClassesContoller {
                 return classesService.getClassesByTeacherId(teacherId);
             default:
                 return null;
+        }
+    }
+
+    @GetMapping("/viewclassroom")
+    @ResponseBody
+    public ResponseEntity<ClassesInfo> viewClass(@RequestParam int classId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
+        String role = (String) authDetails.get("role");
+
+        int userId = userService.getUserByUsername(username).getUserId();
+
+        switch (role){
+            case "1":
+                int studentId = studentsService.getStudentByUserId(userId).getStudentId();
+                ClassesInfo studentClassesInfo = classesService.getStudentsClassByClassId(studentId, classId);
+                return new ResponseEntity<ClassesInfo>(studentClassesInfo, HttpStatusCode.valueOf(200));
+            case "2":
+                int teacherId = teacherService.getTeacherByUserId(userId).getTeacherId();
+                ClassesInfo teacherClassesInfo = classesService.getTeachersClassByClassId(teacherId, classId);
+                return new ResponseEntity<ClassesInfo>(teacherClassesInfo, HttpStatusCode.valueOf(200));
+
+            default:
+                return new ResponseEntity<ClassesInfo>(new ClassesInfo(), HttpStatusCode.valueOf(403));
         }
     }
 }

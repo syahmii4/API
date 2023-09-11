@@ -10,4 +10,6 @@ import java.util.List;
 public interface ClassroomRepository extends CrudRepository<Classroom, Integer> {
     public Classroom findClassroomByClassroomId(int classroomId);
     public List<Classroom> findClassroomByStudentId(int studentId);
+
+    public Classroom findClassroomByStudentIdAndClassId(int studentId, int classId);
 }

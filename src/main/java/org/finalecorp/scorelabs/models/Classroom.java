@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
+
 @Entity
 public class Classroom {
     @Id
@@ -20,4 +22,10 @@ public class Classroom {
     @Getter
     @Setter
     private int classId;
+    @Getter
+    @Setter
+    private Timestamp joinDate;
+    @Getter
+    @Setter
+    private Timestamp lastViewed;
 }
