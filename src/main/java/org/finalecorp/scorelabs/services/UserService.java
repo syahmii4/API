@@ -81,4 +81,12 @@ public class UserService {
         targetUser.setPassword(passwordEncoder.encode((newPassword)));
         usersRepository.save(targetUser);
     }
+
+    public Users getUserByEmail(String email) {
+        return usersRepository.findUsersByEmailAddress(email);
+    }
+
+    public Users getUserByUserId(int userId) {
+        return usersRepository.findUsersByUserId(userId);
+    }
 }
