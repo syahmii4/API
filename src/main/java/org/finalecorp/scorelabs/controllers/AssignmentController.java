@@ -124,4 +124,18 @@ public class AssignmentController {
     public Assignment get(@RequestBody int assignmentId) {
         return assignmentService.getAssignmentById(assignmentId);
     }
+
+    @GetMapping("/stream")
+    @ResponseBody
+    public List<Assignment> stream() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
+        String role = (String) authDetails.get("role");
+
+        int userId = userService.getUserByUsername(username).getUserId();
+        int studentId = studentsService.getStudentByUserId(userId).getStudentId();
+
+        return assignmentService.getAssignmentByStudent(studentId);
+    }
 }

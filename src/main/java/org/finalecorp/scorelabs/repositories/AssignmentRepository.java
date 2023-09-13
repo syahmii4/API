@@ -12,4 +12,6 @@ public interface AssignmentRepository extends CrudRepository<Assignment, Integer
     List<Assignment> findAssignmentByClassId(int classId);
 
     Assignment findAssignmentByAssignmentId(int assignmentId);
+
+    List<Assignment> findAllAssignmentByClassIdIn(List<Integer> classIds);
 }

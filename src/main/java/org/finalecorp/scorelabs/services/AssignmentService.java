@@ -1,14 +1,17 @@
 package org.finalecorp.scorelabs.services;
 
 import org.finalecorp.scorelabs.models.Assignment;
+import org.finalecorp.scorelabs.models.Classes;
 import org.finalecorp.scorelabs.repositories.AssignmentRepository;
 import org.finalecorp.scorelabs.requestObjects.CreateAssignmentForm;
 import org.finalecorp.scorelabs.requestObjects.EditAssignmentForm;
+import org.finalecorp.scorelabs.responseObjects.ClassesInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +42,17 @@ public class AssignmentService {
 
     public List<Assignment> getAssignmentByClass(int classId){
         return assignmentRepository.findAssignmentByClassId(classId);
+    }
+
+    public List<Assignment> getAssignmentByStudent(int studentId){
+        List<ClassesInfo> classes = classesService.getClassesByStudentId(studentId);
+
+        List<Integer> classIds = new ArrayList<>();
+        for (ClassesInfo classesObj : classes) {
+            classIds.add(classesObj.getClassId());
+        }
+
+        return assignmentRepository.findAllAssignmentByClassIdIn(classIds);
     }
 
     public String editAssignment(EditAssignmentForm form) {
