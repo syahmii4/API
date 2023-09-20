@@ -32,6 +32,7 @@ public class ClassesService {
             Classes classes = new Classes();
             classes.setTeacherId(teacherId);
             classes.setClassName(form.className);
+            classes.setDisplayColor(form.displayColor);
             classesRepository.save(classes);
             return classes;
         }
@@ -45,6 +46,7 @@ public class ClassesService {
             Classes classes = classesRepository.findClassesByClassId(form.classId);
             if(teacherId==classes.getTeacherId()){
                 classes.setClassName(form.className);
+                classes.setDisplayColor(form.displayColor);
                 classesRepository.save(classes);
                 return classes;
             }else{
@@ -133,5 +135,9 @@ public class ClassesService {
 
     public Boolean teacherIsClassOwner(int teacherId, int classId){
         return classesRepository.findClassesByClassIdAndTeacherId(classId, teacherId) != null;
+    }
+
+    public Classes getClassesByClassId(int classId) {
+        return classesRepository.findClassesByClassId(classId);
     }
 }

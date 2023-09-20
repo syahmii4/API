@@ -4,6 +4,7 @@ import org.finalecorp.scorelabs.models.Assignment;
 import org.finalecorp.scorelabs.models.Users;
 import org.finalecorp.scorelabs.requestObjects.CreateAssignmentForm;
 import org.finalecorp.scorelabs.requestObjects.EditAssignmentForm;
+import org.finalecorp.scorelabs.responseObjects.AssignmentStream;
 import org.finalecorp.scorelabs.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
@@ -127,7 +128,7 @@ public class AssignmentController {
 
     @GetMapping("/stream")
     @ResponseBody
-    public List<Assignment> stream() {
+    public List<AssignmentStream> stream() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();

@@ -27,4 +27,7 @@ public class Classes {
     @Getter
     @Setter
     private Timestamp dateCreated;
+    @Getter
+    @Setter
+    private String displayColor;
 }

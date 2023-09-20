@@ -5,6 +5,7 @@ import org.finalecorp.scorelabs.models.Classes;
 import org.finalecorp.scorelabs.repositories.AssignmentRepository;
 import org.finalecorp.scorelabs.requestObjects.CreateAssignmentForm;
 import org.finalecorp.scorelabs.requestObjects.EditAssignmentForm;
+import org.finalecorp.scorelabs.responseObjects.AssignmentStream;
 import org.finalecorp.scorelabs.responseObjects.ClassesInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class AssignmentService {
         return assignmentRepository.findAssignmentByClassId(classId);
     }
 
-    public List<Assignment> getAssignmentByStudent(int studentId){
+    public List<AssignmentStream> getAssignmentByStudent(int studentId){
         List<ClassesInfo> classes = classesService.getClassesByStudentId(studentId);
 
         List<Integer> classIds = new ArrayList<>();
@@ -52,7 +53,16 @@ public class AssignmentService {
             classIds.add(classesObj.getClassId());
         }
 
-        return assignmentRepository.findAllAssignmentByClassIdIn(classIds);
+        List<Assignment> assignments= assignmentRepository.findAllAssignmentByClassIdIn(classIds);
+        List<AssignmentStream> assignmentStreams = new ArrayList<>();
+        for(Assignment assignment : assignments) {
+            AssignmentStream stream = new AssignmentStream(assignment);
+            String displayColor = classesService.getClassesByClassId(assignment.getClassId()).getDisplayColor();
+            stream.setDisplayColor(displayColor);
+            assignmentStreams.add(stream);
+        }
+
+        return assignmentStreams;
     }
 
     public String editAssignment(EditAssignmentForm form) {

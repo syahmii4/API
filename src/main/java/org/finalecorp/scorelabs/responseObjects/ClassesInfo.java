@@ -12,6 +12,6 @@ public class ClassesInfo extends Classes {
     };
 
     public ClassesInfo(Classes classesTemp) {
-        super(classesTemp.getClassId(), classesTemp.getClassName(), classesTemp.getTeacherId(), classesTemp.getDateCreated());
+        super(classesTemp.getClassId(), classesTemp.getClassName(), classesTemp.getTeacherId(), classesTemp.getDateCreated(), classesTemp.getDisplayColor());
     }
 }
