@@ -95,4 +95,8 @@ public class AssignmentService {
         assignment.setQuestion(questions);
         assignmentRepository.save(assignment);
     }
+
+    public Map<Object, Object> getQuestionByAssignmentId(int assignmentId) {
+        return assignmentRepository.findAssignmentByAssignmentId(assignmentId).getQuestion();
+    }
 }

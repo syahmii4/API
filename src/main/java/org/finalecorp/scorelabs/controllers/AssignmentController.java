@@ -157,4 +157,26 @@ public class AssignmentController {
             return new ResponseEntity<String>("Could not insert questions", HttpStatusCode.valueOf(403));
         }
     }
+
+    @GetMapping("/getquestions")
+    @ResponseBody
+    public ResponseEntity<Map<Object, Object>> getQuestions(@RequestParam int assignmentId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
+        String role = (String) authDetails.get("role");
+
+        Map<Object, Object> question;
+        ResponseEntity<Map<Object, Object>> response;
+
+        try {
+            question = assignmentService.getQuestionByAssignmentId(assignmentId);
+            response = new ResponseEntity<>(question, HttpStatusCode.valueOf(200));
+        } catch (Exception e) {
+            System.out.println("AYAMAK" + e.getMessage());
+            question = null;
+            response = new ResponseEntity<>(question, HttpStatusCode.valueOf(200));
+        }
+        return response;
+    }
 }
