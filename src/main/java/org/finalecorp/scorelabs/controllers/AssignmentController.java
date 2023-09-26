@@ -213,9 +213,9 @@ public class AssignmentController {
                     node.remove(remove);
                 }
             }
+            Map<Object, Object> questionOnly = objectMapper.convertValue(node, Map.class);
 
-
-            response = new ResponseEntity<>(question, HttpStatusCode.valueOf(200));
+            response = new ResponseEntity<>(questionOnly, HttpStatusCode.valueOf(200));
         } catch (Exception e) {
             System.out.println("AYAMAK" + e.getMessage());
             question = null;
