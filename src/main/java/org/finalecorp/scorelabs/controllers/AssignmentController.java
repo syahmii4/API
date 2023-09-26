@@ -1,5 +1,9 @@
 package org.finalecorp.scorelabs.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.finalecorp.scorelabs.models.Assignment;
 import org.finalecorp.scorelabs.models.Users;
 import org.finalecorp.scorelabs.requestObjects.CreateAssignmentForm;
@@ -184,7 +188,6 @@ public class AssignmentController {
         }
         return response;
     }
-
     @GetMapping("/getassignmentquestions")
     @ResponseBody
     public ResponseEntity<Map<Object, Object>> getAssignmentQuestions(@RequestParam int assignmentId) {
@@ -202,6 +205,14 @@ public class AssignmentController {
 
         try {
             question = assignmentService.getQuestionByAssignmentId(assignmentId);
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode node = (ObjectNode) objectMapper.valueToTree(question);
+            for(int i=0; i<question.size(); i++){
+                String[] objectToRemove = {"questions["+i+"].verbatim", "questions["+i+"].schemeAnswer", "questions["+i+"].answersExpected"};
+                for (String remove:objectToRemove) {
+                    node.remove(remove);
+                }
+            }
 
 
             response = new ResponseEntity<>(question, HttpStatusCode.valueOf(200));
