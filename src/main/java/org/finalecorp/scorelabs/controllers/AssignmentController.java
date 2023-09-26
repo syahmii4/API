@@ -212,6 +212,7 @@ public class AssignmentController {
                     ObjectNode newQuestion = objectMapper.createObjectNode();
                     newQuestion.put("question", n.get("question"));
                     newQuestion.put("questionNumber", n.get("questionNumber"));
+                    newQuestion.put("answersExpected", n.get("answersExpected"));
 
                     nodeArray.add(newQuestion);
                 });
