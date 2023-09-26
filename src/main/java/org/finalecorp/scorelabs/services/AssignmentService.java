@@ -8,6 +8,7 @@ import org.finalecorp.scorelabs.requestObjects.EditAssignmentForm;
 import org.finalecorp.scorelabs.responseObjects.AssignmentStream;
 import org.finalecorp.scorelabs.responseObjects.ClassesInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.spel.ast.Assign;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -43,7 +44,11 @@ public class AssignmentService {
     }
 
     public List<Assignment> getAssignmentByClass(int classId){
-        return assignmentRepository.findAssignmentByClassId(classId);
+        List<Assignment> assignments = assignmentRepository.findAssignmentByClassId(classId);
+        for(Assignment assignment: assignments) {
+            assignment.setQuestion(null);
+        }
+        return assignments;
     }
 
     public List<AssignmentStream> getAssignmentByStudent(int studentId){
@@ -57,6 +62,7 @@ public class AssignmentService {
         List<Assignment> assignments= assignmentRepository.findAllAssignmentByClassIdIn(classIds);
         List<AssignmentStream> assignmentStreams = new ArrayList<>();
         for(Assignment assignment : assignments) {
+            assignment.setQuestion(null);
             AssignmentStream stream = new AssignmentStream(assignment);
             String displayColor = classesService.getClassesByClassId(assignment.getClassId()).getDisplayColor();
             stream.setDisplayColor(displayColor);
@@ -87,7 +93,9 @@ public class AssignmentService {
     }
 
     public Assignment getAssignmentById(int assignmentId) {
-        return assignmentRepository.findAssignmentByAssignmentId(assignmentId);
+        Assignment assignment = assignmentRepository.findAssignmentByAssignmentId(assignmentId);
+        assignment.setQuestion(null);
+        return assignment;
     }
 
     public void insertQuestions(Map<Object, Object> questions, int id) {
