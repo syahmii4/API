@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AssignmentService {
@@ -87,5 +88,10 @@ public class AssignmentService {
 
     public Assignment getAssignmentById(int assignmentId) {
         return assignmentRepository.findAssignmentByAssignmentId(assignmentId);
+    }
+
+    public void insertQuestions(Map<Object, Object> questions, int id) {
+        Assignment assignment = assignmentRepository.findAssignmentByAssignmentId(id);
+        assignment.setQuestion(questions);
     }
 }

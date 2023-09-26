@@ -4,6 +4,7 @@ import org.finalecorp.scorelabs.models.Assignment;
 import org.finalecorp.scorelabs.models.Users;
 import org.finalecorp.scorelabs.requestObjects.CreateAssignmentForm;
 import org.finalecorp.scorelabs.requestObjects.EditAssignmentForm;
+import org.finalecorp.scorelabs.requestObjects.QuestionsForm;
 import org.finalecorp.scorelabs.responseObjects.AssignmentStream;
 import org.finalecorp.scorelabs.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,5 +139,22 @@ public class AssignmentController {
         int studentId = studentsService.getStudentByUserId(userId).getStudentId();
 
         return assignmentService.getAssignmentByStudent(studentId);
+    }
+
+    @PostMapping("/build")
+    @ResponseBody
+    public ResponseEntity<String> build(@RequestBody QuestionsForm form){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
+        String role = (String) authDetails.get("role");
+
+        if(role.equals("2")){
+            assignmentService.insertQuestions(form.questions, form.assignmentId);
+            return new ResponseEntity<String>("Successful", HttpStatusCode.valueOf(200));
+        }
+        else {
+            return new ResponseEntity<String>("Could not insert questions", HttpStatusCode.valueOf(403));
+        }
     }
 }

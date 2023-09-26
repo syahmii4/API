@@ -45,7 +45,7 @@ public class Assignment {
     @Getter
     @Setter
     @JdbcTypeCode(SqlTypes.JSON)
-    private Map<String, String> question;
+    private Map<Object, Object> question;
 
 }
 
