@@ -2,6 +2,7 @@ package org.finalecorp.scorelabs.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.finalecorp.scorelabs.models.Assignment;
@@ -19,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -196,26 +198,29 @@ public class AssignmentController {
         Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
         String role = (String) authDetails.get("role");
 
-        if(!role.equals("2")){
-            return new ResponseEntity<>(null, HttpStatusCode.valueOf(403));
-        }
-
         Map<Object, Object> question;
         ResponseEntity<Map<Object, Object>> response;
 
         try {
             question = assignmentService.getQuestionByAssignmentId(assignmentId);
             ObjectMapper objectMapper = new ObjectMapper();
-            ObjectNode node = (ObjectNode) objectMapper.valueToTree(question);
-            for(int i=0; i<question.size(); i++){
-                String[] objectToRemove = {"questions["+i+"].verbatim", "questions["+i+"].schemeAnswer", "questions["+i+"].answersExpected"};
-                for (String remove:objectToRemove) {
-                    node.remove(remove);
-                }
-            }
-            Map<Object, Object> questionOnly = objectMapper.convertValue(node, Map.class);
+            JsonNode node = objectMapper.valueToTree(question);
 
-            response = new ResponseEntity<>(questionOnly, HttpStatusCode.valueOf(200));
+            ArrayNode nodeArray = objectMapper.createObjectNode().putArray("questions");
+            node.forEach((obj) -> {
+                obj.forEach((n) -> {
+                    ObjectNode newQuestion = objectMapper.createObjectNode();
+                    newQuestion.put("question", n.get("question"));
+                    newQuestion.put("questionNumber", n.get("questionNumber"));
+
+                    nodeArray.add(newQuestion);
+                });
+            });
+
+            ObjectNode jsonNode = objectMapper.createObjectNode();
+            jsonNode.put("questions", nodeArray);
+
+            response = new ResponseEntity<>(objectMapper.convertValue(jsonNode, Map.class), HttpStatusCode.valueOf(200));
         } catch (Exception e) {
             System.out.println("AYAMAK" + e.getMessage());
             question = null;
