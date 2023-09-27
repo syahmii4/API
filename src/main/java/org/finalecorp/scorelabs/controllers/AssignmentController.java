@@ -1,12 +1,6 @@
 package org.finalecorp.scorelabs.controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.finalecorp.scorelabs.models.Assignment;
-import org.finalecorp.scorelabs.models.Users;
 import org.finalecorp.scorelabs.requestObjects.CreateAssignmentForm;
 import org.finalecorp.scorelabs.requestObjects.EditAssignmentForm;
 import org.finalecorp.scorelabs.requestObjects.QuestionsForm;
@@ -17,13 +11,10 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/assignment")
@@ -181,7 +172,7 @@ public class AssignmentController {
         ResponseEntity<Map<Object, Object>> response;
 
         try {
-            question = assignmentService.getQuestionByAssignmentId(assignmentId);
+            question = assignmentService.getQuestionsWithAnswersByAssignmentId(assignmentId);
             response = new ResponseEntity<>(question, HttpStatusCode.valueOf(200));
         } catch (Exception e) {
             System.out.println("AYAMAK" + e.getMessage());
@@ -193,6 +184,9 @@ public class AssignmentController {
     @GetMapping("/getassignmentquestions")
     @ResponseBody
     public ResponseEntity<Map<Object, Object>> getAssignmentQuestions(@RequestParam int assignmentId) {
+        /**
+         *  Returns an HTTP Response including a JSON body with the assignment questions without the answers.
+         */
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
@@ -203,25 +197,7 @@ public class AssignmentController {
 
         try {
             question = assignmentService.getQuestionByAssignmentId(assignmentId);
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode node = objectMapper.valueToTree(question);
-
-            ArrayNode nodeArray = objectMapper.createObjectNode().putArray("questions");
-            node.forEach((obj) -> {
-                obj.forEach((n) -> {
-                    ObjectNode newQuestion = objectMapper.createObjectNode();
-                    newQuestion.put("question", n.get("question"));
-                    newQuestion.put("questionNumber", n.get("questionNumber"));
-                    newQuestion.put("answersExpected", n.get("answersExpected"));
-
-                    nodeArray.add(newQuestion);
-                });
-            });
-
-            ObjectNode jsonNode = objectMapper.createObjectNode();
-            jsonNode.put("questions", nodeArray);
-
-            response = new ResponseEntity<>(objectMapper.convertValue(jsonNode, Map.class), HttpStatusCode.valueOf(200));
+            response = new ResponseEntity<>(question, HttpStatusCode.valueOf(200));
         } catch (Exception e) {
             System.out.println("AYAMAK" + e.getMessage());
             question = null;

@@ -1,5 +1,9 @@
 package org.finalecorp.scorelabs.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.finalecorp.scorelabs.models.Assignment;
 import org.finalecorp.scorelabs.models.Classes;
 import org.finalecorp.scorelabs.repositories.AssignmentRepository;
@@ -104,7 +108,29 @@ public class AssignmentService {
         assignmentRepository.save(assignment);
     }
 
-    public Map<Object, Object> getQuestionByAssignmentId(int assignmentId) {
+    public Map<Object, Object> getQuestionsWithAnswersByAssignmentId(int assignmentId) {
         return assignmentRepository.findAssignmentByAssignmentId(assignmentId).getQuestion();
+    }
+
+    public Map<Object, Object> getQuestionByAssignmentId(int assignmentId) {
+        Map<Object, Object> questions = assignmentRepository.findAssignmentByAssignmentId(assignmentId).getQuestion();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode node = objectMapper.valueToTree(questions);
+
+        ArrayNode nodeArray = objectMapper.createObjectNode().putArray("questions");
+        node.forEach((obj) -> {
+            obj.forEach((n) -> {
+                ObjectNode newQuestion = objectMapper.createObjectNode();
+                newQuestion.put("question", n.get("question"));
+                newQuestion.put("questionNumber", n.get("questionNumber"));
+                newQuestion.put("answersExpected", n.get("answersExpected"));
+
+                nodeArray.add(newQuestion);
+            });
+        });
+
+        ObjectNode jsonNode = objectMapper.createObjectNode();
+        jsonNode.put("questions", nodeArray);
+        return (Map<Object, Object>) objectMapper.convertValue(jsonNode, Map.class);
     }
 }
