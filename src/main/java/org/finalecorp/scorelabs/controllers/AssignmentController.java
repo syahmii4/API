@@ -159,6 +159,9 @@ public class AssignmentController {
     @GetMapping("/getquestions")
     @ResponseBody
     public ResponseEntity<Map<Object, Object>> getQuestions(@RequestParam int assignmentId) {
+        /**
+         *  Returns an HTTP Response including a JSON body with the assignment questions.
+         */
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
