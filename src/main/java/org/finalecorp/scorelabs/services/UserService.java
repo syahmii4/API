@@ -89,4 +89,11 @@ public class UserService {
     public Users getUserByUserId(int userId) {
         return usersRepository.findUsersByUserId(userId);
     }
+
+    public void setUserProfilePictureByUserId(int userId, String fileUrl) {
+        Users users = getUserByUserId(userId);
+
+        users.setProfilePicture(fileUrl);
+        usersRepository.save(users);
+    }
 }

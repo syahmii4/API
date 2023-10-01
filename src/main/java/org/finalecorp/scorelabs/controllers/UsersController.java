@@ -1,5 +1,13 @@
 package org.finalecorp.scorelabs.controllers;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Builder;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import org.finalecorp.scorelabs.models.Users;
 import org.finalecorp.scorelabs.requestObjects.ChangePasswordForm;
 import org.finalecorp.scorelabs.requestObjects.EmailContent;
@@ -9,14 +17,20 @@ import org.finalecorp.scorelabs.services.PasswordChangeRequestService;
 import org.finalecorp.scorelabs.services.RoleService;
 import org.finalecorp.scorelabs.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +39,18 @@ import java.util.Map;
 @RestController
 @CrossOrigin(origins = {"http://localhost:3000"})
 public class UsersController {
+    @Value("${space.endpoint}") // Replace with your Space endpoint
+    private String spaceEndpoint;
+
+    @Value("${space.bucket}") // Replace with your Space name
+    private String spaceBucket;
+    @Value("${space.url}") // Replace with your Space name
+    private String spaceUrl;
+    @Value("${spring.aws.accessKeyId}") // Access Key ID
+    private String awsAccessKeyId;
+
+    @Value("${spring.aws.secretKey}") // Secret Access Key
+    private String awsSecretKey;
     public UserService userService;
     public RoleService roleService;
     public EmailService emailService;
@@ -71,6 +97,7 @@ public class UsersController {
         userResponse.put("email", emailAddress);
         userResponse.put("fullName", fullName);
         userResponse.put("role", roleService.getRoleName(Integer.parseInt(role)));
+        userResponse.put("profilepic", userService.getUserByUsername(username).getProfilePicture());
 
         return new ResponseEntity<>(userResponse, HttpStatusCode.valueOf(200));
     }
@@ -146,6 +173,51 @@ public class UsersController {
         }
         catch (Exception e) {
             return new ResponseEntity<>("Something went wrong", HttpStatusCode.valueOf(400));
+        }
+    }
+
+    @PostMapping("/api/v1/user/setprofilepic")
+    public ResponseEntity<String> setProfilePic(@RequestParam MultipartFile profilePictureFile) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
+
+        Users user = userService.getUserByUsername(username);
+        String currentPFP = user.getProfilePicture();
+
+        if(profilePictureFile.isEmpty()){
+            return new ResponseEntity<>("File not found", HttpStatusCode.valueOf(404));
+        }
+
+        try {
+            BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretKey);
+            AmazonS3 s3 = AmazonS3ClientBuilder.standard()
+                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(spaceEndpoint, "sgp1"))
+                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                    .build();
+
+            InputStream stream = profilePictureFile.getInputStream();
+            Date date = new Date();
+            Timestamp timestamp =  new Timestamp(date.getTime());
+
+            String key = "pfp/u" + user.getUserId() + "-" + timestamp + profilePictureFile.getOriginalFilename();
+
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(profilePictureFile.getContentType());
+
+            s3.putObject(spaceBucket, key, stream, metadata);
+            s3.setObjectAcl(spaceBucket, key, CannedAccessControlList.PublicRead);
+
+            String fileUrl = spaceUrl + "/" + key;
+
+            userService.setUserProfilePictureByUserId(user.getUserId(), fileUrl);
+
+            if(currentPFP != null){
+                s3.deleteObject(spaceBucket, currentPFP.replace(spaceUrl + "/", ""));
+            }
+            return new ResponseEntity<>("Profile picture changed", HttpStatusCode.valueOf(200));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -58,6 +58,8 @@ public class Users {
     @Getter
     @Setter
     private Timestamp lastLogin;
-
+    @Getter
+    @Setter
+    private String profilePicture;
 
 }
