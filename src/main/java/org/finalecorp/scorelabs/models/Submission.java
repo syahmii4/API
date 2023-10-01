@@ -30,7 +30,7 @@ public class Submission {
     @Getter
     @Setter
     @JdbcTypeCode(SqlTypes.JSON)
-    private Map<String, String> answer;
+    private Map<Object, Object> answer;
     @Getter
     @Setter
     private int points;
