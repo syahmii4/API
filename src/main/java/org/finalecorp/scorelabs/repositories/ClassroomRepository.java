@@ -12,4 +12,8 @@ public interface ClassroomRepository extends CrudRepository<Classroom, Integer> 
     public List<Classroom> findClassroomByStudentId(int studentId);
 
     public Classroom findClassroomByStudentIdAndClassId(int studentId, int classId);
+
+    List<Classroom> findAllClassroomByClassroomId(int classId);
+
+    List<Classroom> findAllClassroomByClassId(int classId);
 }
