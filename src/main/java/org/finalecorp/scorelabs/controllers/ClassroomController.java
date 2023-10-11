@@ -139,6 +139,39 @@ public class ClassroomController {
         }
     }
 
+    @GetMapping("/kick")
+    @ResponseBody
+    public ResponseEntity<String> deleteStudent(@RequestParam int classId, @RequestParam int studentId){
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            Map<String, Object> authDetails = (Map<String, Object>) authentication.getDetails();
+            String role = (String) authDetails.get("role");
+
+            int userId = userService.getUserByUsername(username).getUserId();
+            int teacherId = teacherService.getTeacherByUserId(userId).getTeacherId();
+
+            if(!role.equals("2")){
+                return new ResponseEntity<>("tak boyehhhhh", HttpStatusCode.valueOf(403));
+            }
+
+            if(!classesService.teacherIsClassOwner(teacherId, classId)){
+                return new ResponseEntity<>("tak boyehhhhh", HttpStatusCode.valueOf(403));
+            }
+
+            if(classroomService.studentIsInClass(classId, studentId)){
+                classroomService.deleteStudentFromClass(classId, studentId);
+                return new ResponseEntity<>("YOMKEYYYY", HttpStatusCode.valueOf(200));
+            }
+            else {
+                return new ResponseEntity<>("awak takde pun dalam kelas nie", HttpStatusCode.valueOf(406));
+            }
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>("Ayamakkkkkk", HttpStatusCode.valueOf(400));
+        }
+    }
+
     @GetMapping("/getstudents")
     @ResponseBody
     public ResponseEntity<List<StudentInfo>> getStudents(@RequestParam int classId){

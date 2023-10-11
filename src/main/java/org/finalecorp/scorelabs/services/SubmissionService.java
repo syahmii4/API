@@ -5,12 +5,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.finalecorp.scorelabs.models.Assignment;
+import org.finalecorp.scorelabs.models.Students;
 import org.finalecorp.scorelabs.models.Submission;
+import org.finalecorp.scorelabs.models.Users;
 import org.finalecorp.scorelabs.repositories.AssignmentRepository;
 import org.finalecorp.scorelabs.repositories.SubmissionRepository;
 import org.finalecorp.scorelabs.requestObjects.NLPAnswerChecking;
 import org.finalecorp.scorelabs.responseObjects.NLPAnswerGrade;
+import org.finalecorp.scorelabs.responseObjects.SubmissionsInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -32,10 +36,15 @@ public class SubmissionService {
     public SubmissionRepository submissionRepository;
     public AssignmentRepository assignmentRepository;
 
+    public StudentsService studentsService;
+    public UserService userService;
+
     @Autowired
-    public SubmissionService(SubmissionRepository submissionRepository, AssignmentRepository assignmentRepository){
+    public SubmissionService(SubmissionRepository submissionRepository, AssignmentRepository assignmentRepository, StudentsService studentsService, UserService userService){
         this.submissionRepository=submissionRepository;
         this.assignmentRepository=assignmentRepository;
+        this.studentsService=studentsService;
+        this.userService=userService;
     }
 
     public Map<Object, Object> checkAnswers(Map<Object, Object> submission, int studentId){
@@ -135,5 +144,28 @@ public class SubmissionService {
         JsonNode node = objectMapper.readTree(resString);
 
         return objectMapper.readValue(node.get("response").traverse(),  new TypeReference<List<NLPAnswerGrade>>(){});
+    }
+
+    public List<SubmissionsInfo> getSubmissionsByAssignmentId(int assignmentId) {
+        List<Submission> submissions = submissionRepository.findAllSubmissionsByAssignmentId(assignmentId);
+
+        List<SubmissionsInfo> result = new ArrayList<>();
+        for (Submission submission: submissions) {
+            int studentId = submission.getStudentId();
+            int userId = studentsService.getStudentByStudentId(studentId).getUserId();
+            Users user = userService.getUserByUserId(userId);
+            SubmissionsInfo info = new SubmissionsInfo(submission);
+            info.setFullName(user.getFullName());
+            info.setUserName(user.getUsername());
+            info.setProfilePicture(user.getProfilePicture());
+
+            result.add(info);
+        }
+
+        return result;
+    }
+
+    public List<Submission> getSubmissionsByAssignmentIdAndStudentId(int assignmentId, int studentId) {
+        return submissionRepository.findAllSubmissionsByAssignmentIdAndStudentId(assignmentId, studentId);
     }
 }

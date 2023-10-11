@@ -124,6 +124,7 @@ public class AssignmentService {
                 newQuestion.put("question", n.get("question"));
                 newQuestion.put("questionNumber", n.get("questionNumber"));
                 newQuestion.put("answersExpected", n.get("answersExpected"));
+                newQuestion.put("verbatim", n.get("verbatim"));
 
                 nodeArray.add(newQuestion);
             });
