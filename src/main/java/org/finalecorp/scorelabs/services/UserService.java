@@ -12,7 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -95,5 +97,13 @@ public class UserService {
 
         users.setProfilePicture(fileUrl);
         usersRepository.save(users);
+    }
+
+    public List<Users> getUsers() {
+        List<Users> users = (List<Users>) usersRepository.findAll();
+        for (Users user:users) {
+            user.setPassword(null);
+        }
+        return users;
     }
 }
